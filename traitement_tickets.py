@@ -77,13 +77,13 @@ def update_ticket_state(ticket_number, new_state):
             collection.insert_one(ticket)
             redis_client.delete(f"ticket_{ticket_number}")
             print(f"Ticket {ticket_number} finalized and stored in MongoDB.")
- 
+
             # Remove the ticket from the global tickets list
             global tickets
             tickets = [t for t in tickets if t["numero"] != ticket_number]
         else:
             print(f"Ticket {ticket_number} not found in Redis or no update needed.")
- 
+
 # Function to finalize ticket (move from Redis to MongoDB)
 def finalize_ticket(ticket_number):
     ticket_data = redis_client.hgetall(f"ticket_{ticket_number}")
@@ -104,14 +104,14 @@ while True:
         else:
             print(f"Ticket {ticket['numero']} not found in Redis.")
             continue
- 
+
         if current_state != ticket["etat"]:
             if current_state == "attribué":
                 print(f"Ticket {ticket['numero']} state changed to '{current_state}'. Keeping it in Redis.")
             else:
                 update_ticket_state(ticket["numero"], current_state)
     time.sleep(1)
- 
+
  
 # Close connections
 redis_client.close()
